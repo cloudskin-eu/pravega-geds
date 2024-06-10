@@ -1,0 +1,14 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: geds-storage
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: local-path
+reclaimPolicy: Delete # default value is Delete
+allowVolumeExpansion: true
+mountOptions:
+  - discard # this might enable UNMAP / TRIM at the block storage layer
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  guaranteedReadWriteLatency: "true" # provider-specific

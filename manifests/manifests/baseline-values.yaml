@@ -1,0 +1,227 @@
+## Default values for pravega.
+## This is a YAML-formatted file.
+## Declare variables to be passed into your templates.
+
+tls: {}
+  # secret:
+  #   controller: "controller-pki"
+  #   segmentStore: "segmentstore-pki"
+  # caBundle: ""
+reservedPortList: []
+# - 10010  
+authentication:
+  enabled: false
+  ## passwordAuthSecret is ignored if authentication is disabled
+  passwordAuthSecret:
+  ##segmentStoreToken is ignored if authentication is disabled
+  #segmentStoreTokenSecret:
+  ##controllerTokenSecret is ignored if authentication is disabled
+  #controllerTokenSecret:
+
+influxDBSecret: {}
+  # name:
+  # path:
+zookeeperUri: zookeeper-client:2181
+bookkeeperUri: bookkeeper-bookie-headless:3181
+
+externalAccess:
+  enabled: false
+  ## type and domainName are ignored if external access is disabled
+  type: LoadBalancer
+  domainName:
+
+image:
+  repository: pravega/pravega
+  pullPolicy: Always
+hooks:
+  image:
+    repository: lachlanevenson/k8s-kubectl
+    tag: v1.23.2
+  securityContext: {}
+  #  runAsUser: 1001
+  #  runAsGroup: 1001
+
+  backoffLimit: 10
+
+debugLogging: false
+
+controller:
+  replicas: 1
+  maxUnavailableReplicas:
+  envVars: {}
+  svcNameSuffix:
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: 1000m
+      memory: 4Gi
+  securityContext: {}
+    # runAsUser: 0
+  affinity: {}
+  ## service type and annotations are ignored if external access is disabled
+  service:
+    ## used to override the service type for controller
+    type:
+    annotations: {}
+  jvmOptions: ["-Xms1024m", "-XX:+ExitOnOutOfMemoryError", "-XX:+CrashOnOutOfMemoryError", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/tmp/dumpfile/heap", "-XX:MaxRAMPercentage=50.0", "-XX:+UseContainerSupport", "-XX:+PrintExtendedThreadInfo"]
+  labels: {}
+  annotations: {}
+  initContainers: []
+  tolerations: []
+  probes: {}
+  # readiness:
+  #   initialDelaySeconds: 20
+  #   periodSeconds: 10
+  #   failureThreshold: 3
+  #   successThreshold: 3
+  #   timeoutSeconds: 60
+  # liveness:
+  #   initialDelaySeconds: 60
+  #   periodSeconds: 15
+  #   failureThreshold: 4
+  #   successThreshold: 1
+  #   timeoutSeconds: 5
+
+segmentStore:
+  replicas: 1
+  maxUnavailableReplicas:
+  secret: {}
+    # name:
+    # path:
+  env:
+  containerEnv: {}
+  containers: {}
+
+  additionalVolumes: {}
+
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 4Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  securityContext: {}
+    # runAsUser: 0
+  affinity: {}
+  ## service type and annotations are ignored if external access is disabled
+  service:
+    ## used to override the service type for segmentStore
+    type:
+    annotations: {}
+    loadBalancerIP:
+    externalTrafficPolicy:
+  jvmOptions: ["-Xms1g", "-Xmx1g", "-XX:MaxDirectMemorySize=2560m", "-XX:+ExitOnOutOfMemoryError", "-XX:+CrashOnOutOfMemoryError", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/tmp/dumpfile/heap", "-XX:MaxRAMPercentage=50.0", "-XX:+UseContainerSupport", "-XX:+PrintExtendedThreadInfo"]
+  labels: {}
+  annotations: {}
+  stsNameSuffix:
+  headlessSvcNameSuffix:
+  initContainers: []
+  tolerations: []
+  probes: {}
+  # readiness:
+  #   initialDelaySeconds: 10
+  #   periodSeconds: 10
+  #   failureThreshold: 30
+  #   successThreshold: 1
+  #   timeoutSeconds: 5
+  # liveness:
+  #   initialDelaySeconds: 300
+  #   periodSeconds: 15
+  #   failureThreshold: 4
+  #   successThreshold: 1
+  #   timeoutSeconds: 5
+authImplementations: {}
+  # mountPath: "/opt/pravega/pluginlib"
+  # authHandlers:
+  # - image:
+  #   source: "/some_vendor/data/*"
+storage:
+
+  longtermStorage:
+    ## configure the long term storage backend type
+    ## accepted values : filesystem/ecs/hdfs/custom
+    ## default option is filesystem
+    type: custom
+
+    ## fileSystem is used to configure a pre-created Persistent Volume Claim
+    ## as the long term storage backend
+    ## this is the default longtermStorage type
+    filesystem:
+      pvc: pravega-tier2
+
+    ## ecs is used to configure a Dell EMC ECS system as the long term storage backend
+    ## considered only if storage.longtermStorage.type = ecs
+    ecs: {}
+      # configUri: https://object.ecstestdrive.com?namespace=namespace%26identity=user%26secretKey=password
+      # bucket: "bucket"
+      # prefix: "prefix"
+      # credentials: ecs-credentials
+
+    ## hdfs is used to configure an HDFS system as long term storage backend
+    ## considered only if storage.longtermStorage.type = hdfs
+    hdfs: {}
+      # uri: ""
+      # root: ""
+      # replicationFactor:
+
+    ## Custom is used to configure custom storage types
+    ## considered only if storage.longtermStorage.type = custom
+    ## Custom storage type has to be passed in TIER2_STORAGE env
+    custom:
+      options:
+        pravegaservice.storage.layout: "CHUNKED_STORAGE"
+        pravegaservice.storage.impl.name: "S3"
+        s3.connect.config.uri.override: "true"
+        s3.connect.config.uri: http://minio.pravega.svc.cluster.local:80
+        s3.connect.config.access.key: miniostorage
+        s3.connect.config.secret.key: miniostorage
+        s3.bucket: tier-2-baseline
+        s3.prefix: baseline
+      env:
+          TIER2_STORAGE: "S3"
+          AWS_ACCESS_KEY_ID: "miniostorage"
+          AWS_SECRET_ACCESS_KEY: "miniostorage"
+
+
+options:
+  bookkeeper.ensemble.size: "3"
+  bookkeeper.write.quorum.size: "3"
+  bookkeeper.ack.quorum.size: "3"
+  bookkeeper.write.timeout.milliseconds: "60000"
+  bookkeeper.write.outstanding.bytes.max: "33554432"
+  bookkeeper.ledger.size.max: "268435456"
+  pravegaservice.cache.size.max: "1610612736" 
+  pravegaservice.cache.time.seconds.max: "600"
+  pravegaservice.service.listener.port: "12345"
+  hdfs.block.size: "67108864"
+  writer.flush.threshold.bytes: "67108864"
+  writer.flush.size.bytes.max: "67108864"
+  pravegaservice.container.count: "8"
+  controller.container.count: "8"
+  controller.retention.bucket.count: "4"
+  controller.service.asyncTaskPool.size: "20"
+  controller.retention.thread.count: "4"
+  log.level: "INFO"
+  ## The following parameters are only useful if you are going to deploy metrics in this cluster.
+  metrics.dynamicCache.size: "100000"
+  metrics.statistics.enable: "true"
+  metrics.statsD.reporter.enable: "false"
+  metrics.statsD.connect.host: "telegraph.default"
+  metrics.statsD.connect.port: "8125"
+  metrics.influxDB.reporter.enable: "true"
+  metrics.output.frequency.seconds: "10"
+  metrics.influxDB.connect.uri: "http://influxdb-service:8086"
+  controller.metrics.dynamicCache.size: "100000"
+  controller.metrics.statistics.enable: "true"
+  controller.metrics.statsD.reporter.enable: "false"
+  controller.metrics.statsD.connect.host: "telegraph.default"
+  controller.metrics.statsD.connect.port: "8125"
+  controller.metrics.influxDB.reporter.enable: "true"
+  controller.metrics.output.frequency.seconds: "10"
+  controller.metrics.influxDB.connect.uri: "http://influxdb-service:8086"
+  # hostPathVolumeMounts: "foo=/tmp/foo,bar=/tmp/bar"
+  # emptyDirVolumeMounts: "heap-dump=/tmp/dumpfile/heap,logs=/opt/pravega/logs"
+  # configMapVolumeMounts: "prvg-logback:logback.xml=/opt/pravega/conf/logback.xml"
