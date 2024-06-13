@@ -4,6 +4,7 @@ if [ $# -eq 0 ]
     exit 1
 fi
 
+# Scale the minIO replica set to 0, wait the amount of time passed in the argument, then scale the replica set back to 3. 
 kubectl patch sts pravega-pool-0 -n pravega -p '{"spec":{"replicas":0}}'
 echo "Service cut at: $(date +%T)"
 sleep $1

@@ -1,6 +1,8 @@
+# Add minio helm chart
 helm repo add minio-operator https://operator.min.io
 helm search repo minio-operator
 
+# Install minio operator
 helm install \
   --namespace minio-operator \
   --create-namespace \
@@ -14,4 +16,4 @@ kubectl directpv install
 kubectl directpv discover
 kubectl directpv init drives.yaml
 
-echo "Login using $JWT at https://10.15.123.10:9090" 
+echo "Login to the minIO operator dashboard using $JWT" 
