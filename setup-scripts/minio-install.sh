@@ -13,7 +13,8 @@ export JWT=$(kubectl get secret/console-sa-secret -n minio-operator -o json | jq
 # Install DirectPV
 kubectl krew install directpv
 kubectl directpv install
+sleep 10
 kubectl directpv discover
-kubectl directpv init drives.yaml
+kubectl directpv init drives.yaml --dangerous
 
 echo "Login to the minIO operator dashboard using $JWT" 

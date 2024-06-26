@@ -13,13 +13,13 @@ This repository is divided into two main sections, `setup-scripts`, and `experim
 - 4 VM's with at least [current specs of VM] on the same network. One of these will act as a master node, with the other 3 acting as worker nodes. Each worker should have a 100Gb unmounted drive attached for MinIO.
 
 ### 1. Prepare Kubernes Cluster
-
-- Run `adminit.sh` on the master node. Upon completion two things should be printed: A JWT token and a join command. Save these for later.
+- Navigate to `/setup_scripts/`.
+- Run `adminit.sh` on the master node. A join command should be printed. 
 - Run the join command on each worker node.
 
 ### 2. Install MinIO
 
-- On the master node, run `minio-install.sh`. This will install the MinIO operator on the kubernetes cluster.
+- On the master node, run `minio-install.sh`. This will install the MinIO operator on the kubernetes cluster. A JWT token should be printed upon completion, save this for later.
 - On the master node, run `kubectl expose svc/console -n minio-operator --name minio-operator-service --port 9090 --type NodePort`
 - on the master node, run `kubectl get svc -n minio-operator`. In the output, you should see the newly created service, as well as the port it is exposed on. Make note of this port.
 - The MinIO operator should now be accessible via the master node's IP address at the exposed port in your browser: `http://$MASTER_IP:$NODEPORT`. Enter the JWT you saved previously to login.
@@ -28,18 +28,18 @@ This repository is divided into two main sections, `setup-scripts`, and `experim
         - `Name`: pravega
         - `Namespace`: pravega
         - `Number of servers`: 3
-        - `Total Size`: 300
+        - `Total Size`: 295
     - In the "Security" section, set `TLS` to off.
     - In the "Identity Provider" Section, set both the `username` and `password` to "minioadmin".
-- On the master node, run `kubectl expose svc/console -n pravega --name pravega-console-service --port 9090 --type NodePort`. This will allow us to access the MinIO tenant dashboard.
+- Run `kubectl get svc -n pravega` to find the external port for `svc/pravega-console`. Use this to navigate to the MinIO tenant dashboard at `http://$MASTER_IP:$PRAVEGA_CONSOLE_PORT`.
 - In the MinIO tenant dashboard, navigate to the "Access Keys" section. In the top-right corner, click "Create Access Key". Set both the `username` and `password` to "miniostorage", then click "create".
 - First, run the command `kubectl port-forward svc/pravega-hl -n pravega 9000:9000 --address $MASTER_IP`. This will allow the minIO client to connect to the tenant. Note that this must be run after each run of the
 - Install the MinIO Client by following the [official instructions](https://min.io/docs/minio/linux/reference/minio-mc.html?ref=docs). 
-- Run `mc alias set pravega $MASTER_IP:9000 miniostorage miniostorage`.
+- Run `mc alias set pravega http://$MASTER_IP:9000 miniostorage miniostorage`.
 
 ### 3. Running the Experiment
 
-
+- first, navigate to `/experiment/`
 - To configure the experiment, the following files can be modified:
 
     1. `latency-benchmark-runner`. Adjust `experiment_time_seconds` to the desired experiment runtime in seconds. the amount of reader and writer pods can be adjusted by changing the values of: \
@@ -103,5 +103,6 @@ a more abundant Edge resource compared to memory.
 
 ![Ingestion Buffering Capacity Example](media/Ingestion%20Example.png)
 
-Additionally, an example video can be found at [media/GEDS Pravega Demo](media/GEDS%20Pravega%20Demo%20-%20With%20Numbers.mp4).
+Additionally, below is an example video showcasing the setup and usage:
 
+<video src="media/GEDS%20Pravega%20Demo.mp4" controls title="Title"></video>

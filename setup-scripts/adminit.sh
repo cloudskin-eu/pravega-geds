@@ -18,4 +18,4 @@ kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisione
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 echo "Init complete. use the following command to join worker nodes:"
-kubeadm token create --print-join-command
+echo -n "sudo "; kubeadm token create --print-join-command

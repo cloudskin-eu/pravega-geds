@@ -19,5 +19,6 @@ kubectl apply -f https://github.com/pravega/pravega-operator/raw/master/config/c
 helm install pravega-operator pravega/pravega-operator --set webhookCert.certName=selfsigned-cert --set webhookCert.secretName=selfsigned-cert-tls
 helm install pravega pravega/pravega -f manifests/baseline-values.yaml --timeout=10m0s
 ``
-
+# Create bucket
+mc mb pravega/tier-2-baseline
 echo "...Installation complete!"
