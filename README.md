@@ -105,4 +105,7 @@ a more abundant Edge resource compared to memory.
 
 Additionally, below is an example video showcasing the setup and usage:
 
-<video src="media/GEDS%20Pravega%20Demo.mp4" controls title="Title"></video>
+https://github.com/cloudskin-eu/pravega-geds/assets/92449914/868232e1-a9c7-4cb3-b1bc-4582b519479d
+
+
+
