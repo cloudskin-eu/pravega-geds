@@ -16,6 +16,7 @@ kubectl delete pod geds-metadataserver
 
 # Install Zookeeper and Bookkeeper
 helm install zookeeper pravega/zookeeper
+kubectl patch ZookeeperCluster zookeeper -n default --type merge --patch '{"spec": {"replicas": 1}}'
 helm install bookkeeper pravega/bookkeeper 
 
 # Install baseline Pravega

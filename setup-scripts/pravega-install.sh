@@ -8,6 +8,7 @@ kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/downlo
 # Install Zookeeper
 helm install zookeeper-operator pravega/zookeeper-operator
 helm install zookeeper pravega/zookeeper
+kubectl patch ZookeeperCluster zookeeper -n default --type merge --patch '{"spec": {"replicas": 1}}'
 
 # Install Bookkeeper
 kubectl apply -f https://github.com/pravega/bookkeeper-operator/raw/master/config/certmanager/certificate.yaml
