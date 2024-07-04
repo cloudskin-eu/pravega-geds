@@ -197,11 +197,10 @@ spec:
           hdfs.fs.impl: "com.ibm.geds.hdfs.GEDSHadoopFileSystem"
         env:
           GEDS_METADATASERVER: "geds-metadataserver:4381"
-          GEDS_LOCAL_STORAGE_PATH: "/tmp/pravega/cache"
-          GEDS_AVAILABLE_LOCAL_STORAGE: "5368709120"
           AWS_ACCESS_KEY_ID: "miniostorage"
           AWS_SECRET_ACCESS_KEY: "miniostorage"
           AWS_ENDPOINT_URL: "http://minio.pravega.svc.cluster.local:80"
+          GEDS_CONFIGURE_S3_USING_ENV: "1"
 
 
     # See https://github.com/pravega/pravega/blob/3f5b65084ae17e74c8ef8e6a40e78e61fa98737b/config/config.properties
