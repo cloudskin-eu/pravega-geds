@@ -1,3 +1,4 @@
 *.log
 *.json
 drives.yaml
+helm_install.sh
