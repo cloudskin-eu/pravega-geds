@@ -33,10 +33,10 @@ if __name__ == "__main__":
     # Assume that all the python scripts are in the current working directory
     directory_path = os.getcwd() + "/"
     pravega_controller_uri = "pravega-pravega-controller:9090"
-    experiment_time_seconds = 600
+    experiment_time_seconds = 300
 
-    for num_writers_and_streams in [2]:
-        for num_readers_per_stream in [2]:
+    for num_writers_and_streams in [8]:
+        for num_readers_per_stream in [8]:
             for pravega_buffer_size in [1024]:
                 for video_height, video_width in [(1920, 1080)]:
                     for video_fps in [30]:
